@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,6 +67,7 @@ import com.mapmory.services.user.dto.CheckDuplicationDto;
 import com.mapmory.services.user.service.LoginService;
 import com.mapmory.services.user.service.UserService;
 
+@CrossOrigin(origins = {"http://192.168.0.45:3000","http://localhost:3000","https://mapmory.co.kr"},allowCredentials = "true")
 @RestController
 @RequestMapping("/user/rest")
 public class UserRestController {
@@ -197,6 +199,7 @@ public class UserRestController {
 					
 				} else {
 					
+					
 					acceptLogin(userId, role, response, keep);
 					
 					
@@ -207,6 +210,7 @@ public class UserRestController {
 						
 					} else {
 
+						System.out.println("role : " + role);
 						if(role == 1)
 							return ResponseEntity.ok("user");
 						else
@@ -218,6 +222,32 @@ public class UserRestController {
 		}
 	}
 
+
+	
+	////////// 이미지 가져오기 용
+    @GetMapping("/{type}/{uuid}")
+    public byte[] getImage(@PathVariable String type, @PathVariable String uuid) throws Exception {
+    	
+    	byte[] bytes; 
+    	switch(type) {
+    	
+    		case "profile" :
+    			bytes = objectStorageUtil.getImageBytes(uuid, PROFILE_FOLDER_NAME);
+    			break;
+    		case "thumbnail" :
+    			bytes = objectStorageUtil.getImageBytes(uuid, TIMELINE_THUMBNAIL);
+    			break;
+    		case "emoji" :
+    			bytes = objectStorageUtil.getImageBytes(uuid, TIMELINE_EMOJI);
+    			break;
+    		default:
+    			bytes = null;
+    	}
+
+        return bytes;
+    }
+	
+	
 	@PostMapping("/signUp")
 	public ResponseEntity<Boolean> signUp(@RequestBody User user, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -454,6 +484,8 @@ public class UserRestController {
 		// 기존 키가 없으면 새로 발급
 		if(encodedKey == null) {
 			
+			System.out.println("new");
+			
 			encodedKey = new String(userService.generateSecondAuthKey());
 			// client에 저장하기 보다는 redis에 저장해서 client가 오동작해도 키가 증발하지 않게 한다. (localStorage에 저장했다가 삭제하는 것이 베스트)
 			
@@ -480,8 +512,9 @@ public class UserRestController {
 
 	}
 	
+	//////////////////// 2단계 인증 key가 날라가는 문제를 확인. 왜 날라갔지? ////////////////////
 	@PostMapping("/checkSecondaryKey")
-	public ResponseEntity<Boolean> checkSecondaryKey(@RequestBody Map<String, String> map, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ResponseEntity<Map<String, String>> checkSecondaryKey(@RequestBody Map<String, String> map, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		Cookie cookie = CookieUtil.findCookie("SECONDAUTH", request);
 		// 5분안에 인증 못하면 세션 날라가서 keyname 날라감. 다시 로그인해서 발급받게 만들어서 보안 강화.
@@ -517,7 +550,8 @@ public class UserRestController {
 			// response.addCookie(CookieUtil.createCookie("SECONDAUTHKEY", "", 0, "/"));
 		}
 		
-		return ResponseEntity.ok(result);
+		tempMap.put("result", String.valueOf(result));
+		return ResponseEntity.ok(tempMap);
 	}
 	
 	
@@ -580,27 +614,7 @@ public class UserRestController {
 	}
 
     
-    @GetMapping("/{type}/{uuid}")
-    public byte[] getImage(@PathVariable String type, @PathVariable String uuid) throws Exception {
-    	
-    	byte[] bytes; 
-    	switch(type) {
-    	
-    		case "profile" :
-    			bytes = objectStorageUtil.getImageBytes(uuid, PROFILE_FOLDER_NAME);
-    			break;
-    		case "thumbnail" :
-    			bytes = objectStorageUtil.getImageBytes(uuid, TIMELINE_THUMBNAIL);
-    			break;
-    		case "emoji" :
-    			bytes = objectStorageUtil.getImageBytes(uuid, TIMELINE_EMOJI);
-    			break;
-    		default:
-    			bytes = null;
-    	}
 
-        return bytes;
-    }
 	
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////

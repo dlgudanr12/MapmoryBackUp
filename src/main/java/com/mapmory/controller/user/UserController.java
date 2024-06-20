@@ -40,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mapmory.common.domain.Page;
 import com.mapmory.common.domain.Search;
 import com.mapmory.common.domain.SessionData;
 import com.mapmory.common.util.ContentFilterUtil;
@@ -99,6 +100,9 @@ public class UserController {
 	@Value("${object.profile.folderName}")
 	private String PROFILE_FOLDER_NAME;
 	
+	@Value("${page.Unit}")
+    int pageUnit;
+
 	@Value("${page.Size}")
 	private int pageSize;
 	
@@ -280,6 +284,7 @@ public class UserController {
 		}
 				
 		System.out.println(profile);
+		model.addAttribute("userId", myUserId);
 		model.addAttribute("sessionId", myUserId);
 		model.addAttribute("profile", profile);
 		// model.addAttribute("profileImage", objectStorageUtil.getImageBytes(profile.getUser().getProfileImageName(), PROFILE_FOLDER_NAME));
@@ -297,6 +302,7 @@ public class UserController {
 		
 		// model.addAttribute("type", 0);
 		model.addAttribute("list", followList);
+		model.addAttribute("sessionId", myUserId);
 		// model.addAttribute("sessionId", myUserId);
 		// model.addAttribute("profileFolder",  PROFILE_FOLDER_NAME);
 	}
@@ -437,13 +443,20 @@ public class UserController {
 	    }
 	}
 	
+	/// 현재 문제가 있다.
+	/*
 	@RequestMapping("/google/auth/callback")
 	public void googleLogin(@RequestParam String code, HttpServletResponse response) throws Exception {
 
 		// System.out.println("code : " + code);
 		
-		 userService.getGoogleProfie(code);
+		 // userService.getGoogleProfie(code);
+		
+		GoogleToken token = userService.getGoogleToken(code);
+		GoogleJwtPayload payload = userService.getGoogleProfile(token.getId_token());
+		System.out.println(payload);
 	}
+	*/
 	
 	@GetMapping("/getNaverLoginView")
 	public String getNaverLoginView() {
@@ -499,8 +512,21 @@ public class UserController {
 	}
 	
 	@GetMapping("/admin/getAdminUserList")
-	public void getAdminUserList() {
+	public void getAdminUserList(Model model, HttpServletRequest request, @ModelAttribute Search search) {
+
+		if(search.getCurrentPage() == 0) {
+			search.setCurrentPage(1);
+		}
 		
+		search.setPageSize(pageSize);
+		
+		Map<String, Object> map = userService.getUserList(search);
+		Page resultPage = new Page(search.getCurrentPage(),((Integer)map.get("count")).intValue(),pageUnit,pageSize);
+
+       //  model.addAttribute("userList", (List<User>) map.get("userList"));
+        model.addAttribute("userList",  map.get("userList"));
+        model.addAttribute("search", search);
+        model.addAttribute("resultPage", resultPage);
 	}
 	
 	@GetMapping("/admin/getAdminDetailUser")
@@ -508,14 +534,17 @@ public class UserController {
 		
 		User user = userService.getDetailUser(userId);
 		
-		Map<String, String> map= userService.checkSuspended(userId);
+		Map<String, String> suspendMap= userService.checkSuspended(userId);
 		
-		String isSuspended = map.get("isSuspended");
+		String isSuspended = suspendMap.get("isSuspended");
 		
 		if(isSuspended.equals("true"))
-			user.setEndSuspensionDate(java.time.LocalDate.parse(map.get("endSuspensionDate")));
+			user.setEndSuspensionDate(java.time.LocalDate.parse(suspendMap.get("endSuspensionDate")));
+		
+		System.out.println(suspendMap.get("endSuspensionDate"));
 		
 		model.addAttribute("user", user);
+		model.addAttribute("suspendMap", suspendMap);
 	}
 	
 	///////////////////////////////////////////////////////////////////////
