@@ -74,13 +74,30 @@ public class MainController {
 	}
 	
 	@GetMapping("/common/menu")
-	public void getMenu() {
-		
+	public void getMenu(HttpServletRequest request, Model model) {
+
+		SessionData sessionData = redisUtil.getSession(request);
+	
+		model.addAttribute("userId", sessionData.getUserId());		
 	}
 	
 	// test용
 	@GetMapping("/common/footer")
-	public void getFooter() {
+	public void getFooter(HttpServletRequest request, Model model) {
+		
+		SessionData sessionData = redisUtil.getSession(request);
+		
+		model.addAttribute("userId", sessionData.getUserId());
+		
+	}
+	
+	@GetMapping("/test")
+	public String test() {
+		return "/test.html";
+	}
+	
+	@GetMapping("/common/toolBar")
+	public void getToolBar() {
 		
 	}
 }

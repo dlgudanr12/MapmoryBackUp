@@ -3,8 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<th:block th:replace="~{/common/dependencies}"></th:block>
-	<link href="/css/user/profile-image.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/user/profile-image.css"  >
+	<link rel="stylesheet" href="/css/common/mapmory-color.css"  >
 	<link rel="stylesheet" href="/css/common/footer.css">
+	
 	<title>프로필</title>
 	
 	<style>
@@ -19,18 +21,29 @@
 			display: flex;
     		align-items: center;
 		}
+		
 	</style>
 	
 	
 	
 	<script th:inline="javascript">
 	
-		const userId = [[${profile.user.userId}]];  // targetId
+		const profileUserId = [[${profile.user.userId}]];
+		const sessionId = `[[${sessionId}]]`;
+		let isLoading = false;
+		let pageType = null;
+		
+		// console.log('profileUserId : ' + userId);
 	
 		$(function(){
 	
 			const myProfile = [[${myProfile}]];
 			const isFollow = [[${isFollow}]];
+			pageType = $('#pageType');
+			pageType.text('sharedList');
+			console.log(pageType.html());
+			console.log("pageType = " + pageType.text());
+			
 			
 			console.log("내 프로필 : " + myProfile);
 			
@@ -67,17 +80,17 @@
 			$('#follow-list').on('click', function() {
 				
 				console.log("flag");
-				window.location.href="/user/getFollowList?userId="+userId;
+				window.location.href="/user/getFollowList?userId="+profileUserId;
 			});
 			
 			$('#follower-list').on('click', function() {
 				
-				window.location.href="/user/getFollowerList?userId="+userId;
+				window.location.href="/user/getFollowerList?userId="+profileUserId;
 			});
 			
 			$('#updateProfile').on('click', function() {
 				
-				window.location.href="/user/getUpdateProfileView?userId="+userId;
+				window.location.href="/user/getUpdateProfileView?userId="+profileUserId;
 			});
 					
 			$('#deleteFollow').on('click', function() {
@@ -87,7 +100,7 @@
 			      method: "POST",
 			      contentType:"application/json",
 			      data: JSON.stringify({
-			        targetId: userId
+			        targetId: profileUserId
 			      }),
 			      success: function(response) {
 			        
@@ -117,7 +130,7 @@
 			      method: "POST",
 			      contentType:"application/json",
 			      data: JSON.stringify({
-			        targetId: userId
+			        targetId: profileUserId
 			      }),
 			      success: function(response) {
 			        
@@ -149,15 +162,13 @@
 			
 			$('#chat').on('click', function() {
 				
-				const sessionId = `[[${sessionId}]]`;
-				
 				$.ajax({
 	               url: "https://mapmory.co.kr/chatting/findOneChatRoom",
 	               method: "POST",
 	               contentType:"application/json",
 	               data: JSON.stringify({
 	                userId: sessionId,
-	                 opponent: userId
+	                 opponent: profileUserId
 	               }),
 	               success: function(response) {
 	                 
@@ -185,6 +196,8 @@
 			$('#reactRecordList').css('display', 'none');
 			$('#reactReplyList').css('display', 'none');
 			
+			$('#sharedRecordListBtn').addClass('btn-secondary-custom');
+			
 			$('#sharedRecordListBtn').on('click', function() {
 				
 				$('#sharedRecordList').css('display', 'block');
@@ -192,6 +205,13 @@
 				$('#bookMarkList').css('display', 'none');
 				$('#reactListDiv').css('display', 'none');
 				
+				$('#sharedRecordListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
+				$('#replyListBtn').removeClass('btn-secondary-custom');
+				$('#bookMarkListBtn').removeClass('btn-secondary-custom');
+				$('#reactListBtn').removeClass('btn-secondary-custom');
+				
+				pageType.text('sharedRecord');
+				// console.log(pageType.text());
 				
 			});
 						
@@ -202,6 +222,12 @@
 				$('#bookMarkList').css('display', 'none');
 				$('#reactListDiv').css('display', 'none');	
 				
+				$('#sharedRecordListBtn').removeClass('btn-secondary-custom');
+				$('#replyListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
+				$('#bookMarkListBtn').removeClass('btn-secondary-custom');
+				$('#reactListBtn').removeClass('btn-secondary-custom');
+				
+				pageType.text('replyList');
 			});
 						
 			$('#bookMarkListBtn').on('click', function() {
@@ -210,6 +236,13 @@
 				$('#replyList').css('display', 'none');
 				$('#bookMarkList').css('display', 'block');
 				$('#reactListDiv').css('display', 'none');	
+				
+				$('#sharedRecordListBtn').removeClass('btn-secondary-custom');
+				$('#replyListBtn').removeClass('btn-secondary-custom');
+				$('#bookMarkListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
+				$('#reactListBtn').removeClass('btn-secondary-custom');
+				
+				pageType.text('bookMarkList');
 				
 			});
 			
@@ -222,6 +255,15 @@
 				$('#reactRecordList').css('display', 'block');
 				$('#reactReplyList').css('display', 'none');
 				
+				$('#sharedRecordListBtn').removeClass('btn-secondary-custom');
+				$('#replyListBtn').removeClass('btn-secondary-custom');
+				$('#bookMarkListBtn').removeClass('btn-secondary-custom');
+				$('#reactListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
+				
+				$('#reactRecordListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
+				$('#reactReplyListBtn').removeClass('btn-secondary-custom');
+				
+				pageType.text('reactRecordList');
 			});
 			
 			$('#reactRecordListBtn').on('click', function() {
@@ -232,7 +274,11 @@
 				$('#reactListDiv').css('display', 'block');
 				$('#reactRecordList').css('display', 'block');
 				$('#reactReplyList').css('display', 'none');
+				$('#reactRecordListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
+				$('#reactReplyListBtn').removeClass('btn-secondary-custom');
 				
+				
+				pageType.text('reactRecordList');
 			});
 			
 			$('#reactReplyListBtn').on('click', function() {
@@ -243,19 +289,37 @@
 				$('#reactListDiv').css('display', 'block');
 				$('#reactRecordList').css('display', 'none');
 				$('#reactReplyList').css('display', 'block');
+				$('#reactRecordListBtn').removeClass('btn-secondary-custom');
+				$('#reactReplyListBtn').removeClass('btn-secondary-custom').addClass('btn-secondary-custom');
 				
+				pageType.text('reactReplyList');
 			});
-			
+
+			$(document).on('click', '.record', function() {
+				
+				const recordNo = $(this).attr('id');
+				window.location.href=`/timeline/getDetailTimeline?recordNo=${recordNo}`;
+			});
+
+			$(document).on('click', '.reply', function() {
+				
+				const recordNo = $(this).attr('id');
+				window.location.href=`/community/getReplyList/${recordNo}`;
+			});
 		});
+
 		
-		
+		// modal event
 		$(function() {
 			
 			$('#reportUser').on('click', function(){
 				
+				const profileUserNickname = [[${profile.user.nickname}]];
+				
 				const reportData = {
-						userId : [[${sessionId}]] ,
-						targetUserId : [[${profile.user.userId}]]
+						userId : sessionId ,
+						targetUserId : profileUserId,
+						nickname : profileUserNickname,
 				}
 				
 				sessionStorage.setItem('reportData', JSON.stringify(reportData));
@@ -264,15 +328,18 @@
 				
 			});
 			
-			/* 사용자 차단하기
+			// 사용자 차단하기
 			$('#blockUser').on('click', function(){
 				
+				// 정말 차단하시겠습니까?
+				
 				$.ajax({
-			      url: "/community/rest/doReport",
+			      url: "/community/rest/addBlockUser",
 			      method: "POST",
 			      contentType:"application/json",
 			      data: JSON.stringify({
-			        targetId: userId
+			    	  userId : sessionId,
+			          targetId: userId
 			      }),
 			      success: function(response) {
 			        
@@ -297,7 +364,7 @@
 			    });
 				
 			});
-			*/
+			
 		});
 
 		</script>
@@ -306,74 +373,80 @@
 <body>
 	
 	<div class="container mt-3" id="content-for-footer">
-		<div class="row">
-			<a class="col-1 text-start fs-1" href="javascript:history.back()">⇦</a>
-			<div class="col-10 mt-2">
-				<strong><span class="align-middle" th:text="${profile.user.nickname}"></span></strong>
-				<p th:if="${profile.isSubscribed == true}">☑️</p>
+		<div class="sticky-top" style="background:#FFFFFF">
+			<!-- <div class="row">  -->
+			<div class="d-flex">
+				<a class="col-1 text-start fs-1" href="javascript:history.back()">⇦</a>
+				<div class="col-10 mt-2 d-flex">
+					<strong><span class="align-middle me-2 h4" th:text="${profile.user.nickname}"></span></strong>
+					<p th:if="${profile.isSubscribed == true}">☑️</p>
+				</div>
+				<p class="col-1 text-end fs-1" data-bs-toggle="modal" data-bs-target="#exampleModal" style="cursor: pointer;">=</p>
 			</div>
-			<p class="col-1 text-end fs-1" data-bs-toggle="modal" data-bs-target="#exampleModal" style="cursor: pointer;">=</p>
+			
+			<!-- <div class="row row-cols-5 text-center">  -->
+			<div class="row text-center">
+				
+				<!-- 
+				<div class="profile-box">
+					<img class="profile" alt="" th:src="@{/user/rest/profile/{uuid}(uuid=${profile.user.profileImageName})}">
+				</div>
+ 				-->
+				<div class="profile-box-custom">
+					<img class="profile-custom" alt="" th:src="@{/user/rest/profile/{uuid}(uuid=${profile.user.profileImageName})}">
+				</div>
+
+				 
+				  <div id="shared-list" class="col">
+				  	<div class="mt-4">
+					    <span>sharing</span>
+					    <br/>
+					    <span class="value" th:text="${profile.totalSharedListCount}"></span>
+				    </div>
+				  </div>
+				  <div id="follow-list" class="col">
+				  	<div class="mt-4">
+			    		<span>follow</span>
+			    		<br/>
+			    		<span class="value" th:text="${profile.totalFollowCount}"></span>
+				    </div>
+				  </div>
+				  <div id="follower-list" class="col">
+				  	<div class="mt-4">
+					    <span>follower</span>
+					    <br/>
+				    	<span class="value" th:text="${profile.totalFollowerCount}"></span>
+				    </div>
+				  </div>
+		
+			</div>
+			
+			<p class="row mt-3 ms-1" th:text="${profile.user.introduction}"></p>
+	
+			<div id="myProfile" style="display:none;">
+				<div class="d-flex justify-content-evenly">
+					<button type="button" id="updateProfile" class="btn btn-primary w-50">내 프로필 수정</button>
+					<button type="button" id="myChatList" class="btn btn-primary w-50">나의 채팅</button>
+				</div>
+			</div>	
+			<div id="otherProfile" style="display:none;">
+				<div class="d-flex justify-content-evenly ">
+					<button type="button" id="deleteFollow" class="btn btn-primary w-50" style="display:none;">언팔로우</button>
+					<button type="button" id="addFollow" class="btn btn-primary w-50" style="display:none;">팔로우</button>
+					<button type="button" id="chat" class="btn btn-primary w-50">메세지 보내기</button>
+				</div>
+			</div>
+			<hr/>
 		</div>
 		
-		<div class="row row-cols-5 text-center">
-			<div class="profile-box col">
-				<img class="profile" alt="" th:src="@{/user/rest/profile/{uuid}(uuid=${profile.user.profileImageName})}">
-			</div>
-	
-			  <div id="shared-list" class="col">
-			  	<div class="mt-4">
-				    <span>sharing</span>
-				    <br/>
-				    <span class="value" th:text="${profile.totalSharedListCount}"></span>
-			    </div>
-			  </div>
-			  <div id="follow-list" class="col">
-			  	<div class="mt-4">
-		    		<span>follow</span>
-		    		<br/>
-		    		<span class="value" th:text="${profile.totalFollowCount}"></span>
-			    </div>
-			  </div>
-			  <div id="follower-list" class="col">
-			  	<div class="mt-4">
-				    <span>follower</span>
-				    <br/>
-			    	<span class="value" th:text="${profile.totalFollowerCount}"></span>
-			    </div>
-			  </div>
-	
-		</div>
-		
-		<p class="row mt-3" th:text="${profile.user.introduction}"></p>
-
-		<div id="myProfile" style="display:none;">
-			<div class="d-flex justify-content-evenly">
-				<button type="button" id="updateProfile" class="btn btn-info w-50">내 프로필 수정</button>
-				<button type="button" id="myChatList" class="btn btn-info w-50">나의 채팅</button>
-			</div>
-		</div>	
-		<div id="otherProfile" style="display:none;">
-			<div class="d-flex justify-content-evenly ">
-				<button type="button" id="deleteFollow" class="btn btn-info" style="display:none;">언팔로우</button>
-				<button type="button" id="addFollow" class="btn btn-info" style="display:none;">팔로우</button>
-				<button type="button" id="chat" class="btn btn-info">메세지 보내기</button>
-			</div>
-		</div>
-
-		<hr/>
-	
-		<!-- 현재 REST 지원 안됨. -->
-		<!-- 다음 주에 rest 지원 예쩡 -->
-		<!-- TimelineRestController의 /timeline/rest/getProfileTimelineList 에서 값을 받아올 것 -->
-		<!-- Map으로 받아옴. key 이름은 TimelineMapper의 recordResultMap을 참고할 것. -->
-		<!-- recordTitle, categoryName, categoryImogi, recordAddDate, imageTagList.imageTagOrder, imageTagList.imageTagType, imageTagList.imageTagText -->
-		<div class="row">
-			<button class="col btn btn-light" type="button" id="sharedRecordListBtn">공유한 기록</button>
-			<button class="col btn btn-light" type="button" id="replyListBtn">작성한 댓글</button>
+		<p id="pageType" style="display:none;"></p>
+		<div class="row mx-2">
+			<button class="col btn btn-light" type="button" id="sharedRecordListBtn">공유한<br/>기록</button>
+			<button class="col btn btn-light" type="button" id="replyListBtn">작성한<br/>댓글</button>
 			<th:block th:if="${myProfile==true}">
 				<button class="col btn btn-light" type="button" id="bookMarkListBtn">즐겨찾기</button>
 			</th:block>
-			<button class="col btn btn-light" type="button" id="reactListBtn">좋아요 목록</button>
+			<button class="col btn btn-light" type="button" id="reactListBtn">좋아요<br/>목록</button>
 		</div>
 		<hr/>
 		
@@ -398,7 +471,7 @@
 		  <div class="modal-dialog">
 		    <div class="modal-content text-center">
 		      <div class="modal-header">
-		        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+		        <!-- <h1 class="modal-title fs-5" id="exampleModalLabel"></h1>  -->
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		      </div>
 		      <div class="modal-body">

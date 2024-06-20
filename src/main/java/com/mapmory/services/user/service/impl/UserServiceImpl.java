@@ -413,9 +413,18 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 
+	/**
+	 * searchCondition :: 0 = ID, 1 = 닉네임
+	 * searchKeyword :: 검색어
+	 * pageSize :: 보여지는 개수
+	 * currentPage :: 현재 페이지
+	 */
 	@Override
 	public Map<String, Object> getUserList(Search search) {
 		// TODO Auto-generated method stub
+		
+		if(search.getSearchCondition() == 0)
+			search.setSearchCondition(-1);
 		
 		List<User> userList = userDao.selectUserList(search);
 		int count = userDao.getUserListTotalCount(search);
@@ -872,6 +881,7 @@ public class UserServiceImpl implements UserService {
 			
 			System.out.println("suspensionDetailList : " + list);
 			int count = list.size();
+			map.put("suspentionCount", String.valueOf(count));
 			LocalDateTime lastSuspensionDate = list.get(count-1).getStartSuspensionDate();
 			LocalDateTime now = LocalDateTime.now();
 			switch(count) {
@@ -1086,10 +1096,10 @@ public class UserServiceImpl implements UserService {
 	}
 	*/
 	
-	
+	/*
 	public GoogleJwtPayload getGoogleProfie(String code) throws JsonMappingException, JsonProcessingException, UnsupportedEncodingException {
 
-		/*
+		
 		// Parameter로 전달할 속성들 추가
 	    Map<String, String> params = new HashMap<>();
 	    params.put("grant_type","authorization_code");
@@ -1131,11 +1141,11 @@ public class UserServiceImpl implements UserService {
         in.close();
 	    
 	    System.out.println(res);
-        */
+ 		
 		
 		// GoogleJwtPayload payload = userService.getGoogleProfie(code);
 		
-		/*
+		
 		GoogleToken token = userService.getGoogleToken(code);
 		System.out.println(token);
 		GoogleJwtPayload payload = userService.getGoogleProfile(token.getId_token());
@@ -1166,10 +1176,11 @@ public class UserServiceImpl implements UserService {
 	    	return "redirect:/map";
 	    	
 	    }
-				*/
+				s
 		
 		return null;
 	}
+	*/
 	
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
