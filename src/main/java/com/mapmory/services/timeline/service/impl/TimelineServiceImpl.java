@@ -120,8 +120,8 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public void deleteCategory(int categoryNo) throws Exception {
-		timelineDao.deleteCategory(categoryNo);
+	public int deleteCategory(int categoryNo) throws Exception {
+		return timelineDao.deleteCategory(categoryNo);
 	}
 	
 	@Override

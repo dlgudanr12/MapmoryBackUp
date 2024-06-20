@@ -151,8 +151,8 @@ public class TimelineController {
 		model.addAttribute("positions",jsonPostions);
 		model.addAttribute("positionParam",jsonParam);
 		}
-//		model.addAttribute("apiKey", kakaoMapApiKey);
-//		model.addAttribute("tMapApiKey",tMapApiKey);
+		model.addAttribute("apiKey", kakaoMapApiKey);
+		model.addAttribute("tMapApiKey",tMapApiKey);
 		model.addAttribute("restKey",restKey);
 		model.addAttribute("timelineList", timelineList);
 		model.addAttribute("selectDay",selectDay);

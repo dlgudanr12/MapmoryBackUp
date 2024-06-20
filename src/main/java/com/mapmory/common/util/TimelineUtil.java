@@ -362,7 +362,10 @@ public class TimelineUtil {
 			System.out.println("List<MultipartFile> imageFile : "+imageFile);
 			
 			for (MultipartFile image : imageFile) {
-				if (image.isEmpty() || image.getOriginalFilename() == null || image.getOriginalFilename().isEmpty()) {
+				if (image==null
+						|| image.isEmpty() 
+						|| image.getOriginalFilename() == null 
+						|| image.getOriginalFilename().isEmpty()) {
 	            System.out.println("Invalid file name: " + image.getOriginalFilename());
 	            continue;
 				}
@@ -385,7 +388,9 @@ public class TimelineUtil {
 		
 		public Record uploadMediaFile(Record record,MultipartFile mediaFile) throws Exception {
 
-			if (mediaFile.isEmpty() || mediaFile.getOriginalFilename() == null
+			if (mediaFile==null
+					|| mediaFile.isEmpty() 
+					|| mediaFile.getOriginalFilename() == null
 					|| mediaFile.getOriginalFilename().isEmpty()) {
 				System.out.println("Invalid file name: " + record.getMediaName());
 				return record;
@@ -400,7 +405,9 @@ public class TimelineUtil {
 		
 		public Category uploadImojiFile(Category category,MultipartFile imojiFile) throws Exception {
 
-			if (imojiFile.isEmpty() || imojiFile.getOriginalFilename() == null
+			if (imojiFile==null
+					||imojiFile.isEmpty() 
+					|| imojiFile.getOriginalFilename() == null
 					|| imojiFile.getOriginalFilename().isEmpty()) {
 				System.out.println("Invalid file name: " + category.getCategoryImoji());
 				return category;

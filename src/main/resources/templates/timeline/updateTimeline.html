@@ -50,7 +50,7 @@
     <div class="row">
 		<label for="categoryNo" class="form-label mt-4" th:text="'카테고리'"></label>
     	<select class="form-select" th:field="*{categoryNo}">
-			<option th:value="0" th:text="'없음'"/>
+			<option th:value="0" th:text="'전체'"/>
 			<option th:each="c : ${category}" th:value="${c.categoryNo}" th:text="${c.categoryName}" th:selected="${record.categoryNo == c.categoryNo}"/>
 		</select>
 		<small id="categoryHelp" class="form-text text-muted" th:text="'카테고리 미설정 시, \'전체\' 로 분류됩니다.'"></small>
@@ -154,6 +154,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 체크박스의 상태가 변경될 때마다 라벨을 업데이트합니다.
     checkbox.addEventListener('change', updateLabel);
+});
+
+document.getElementById('recordTitle').addEventListener('input', function () {
+    var inputField = this;
+    let textInt=50;
+    if (inputField.value.length > textInt) {
+        inputField.value = inputField.value.substring(0, textInt);
+        alert("기록 제목은 "+textInt+"자를 넘길 수 없습니다.");
+    }
+});
+
+document.getElementById('recordText').addEventListener('input', function () {
+    var inputField = this;
+    let textInt=1000;
+    if (inputField.value.length > textInt) {
+        inputField.value = inputField.value.substring(0, textInt);
+        alert("기록 제목은 "+textInt+"자를 넘길 수 없습니다.");
+    }
 });
 
 //입력된 해시태그를 처리하는 함수

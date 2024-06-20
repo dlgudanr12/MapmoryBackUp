@@ -38,12 +38,14 @@ body {
 	<button id="addCategory" type="button" class="btn btn-primary btn-lg" th:name="addCategory" th:text="'생성하기'"></button>
 	<div id="categoryDiv">
 		<span th:each="category : ${categoryList}">
-			<span th:id="categorySpan" th:name="categorySpan" th:data-categoryno="${category.categoryNo}" class="btn">
-				<img th:src="${category.categoryImoji}" style="height:24px;"/>
-				<span th:text="${category.categoryName}"></span>
-			</span>
-    		<button class="btn btn-primary btn-sm" type="button" th:name="categoryX" 
-    		th:data-categoryNo="${category.categoryNo}" th:text="X"></button>
+			<span th:name="${category.categoryNo}">
+				<span th:id="categorySpan" th:name="categorySpan" th:data-categoryno="${category.categoryNo}" class="btn">
+					<img th:src="${category.categoryImoji}" style="height:24px;"/>
+					<span th:text="${category.categoryName}"></span>
+				</span>
+	    		<button class="btn btn-primary btn-sm" type="button" th:name="categoryX" 
+	    		th:data-categoryno="${category.categoryNo}" th:data-categoryname="${category.categoryName}" th:text="X"></button>
+    		</span>
 		</span>
 	</div>
 </div>
@@ -75,13 +77,36 @@ function newWindow(url,width,height){
 $(function() {
 	$("button[name='addCategory']").click(function() {
 		let url="/timeline/addCategory";
-		newWindow(url,450,400);
+		newWindow(url,400,350);
 	})
 	$('span[name="categorySpan"]').click(function() {
 		let categoryNo=$(this).data('categoryno');
 		let uri="?categoryNo="+categoryNo;
 		let url="/timeline/updateCategory"+uri;
-		newWindow(url,450,400);
+		newWindow(url,400,500);
+	})
+	
+	
+	$("button[name='categoryX']").click(function() {
+		let categoryNo=$(this).data('categoryno');
+		let categoryName=$(this).data('categoryname');
+		//console.log(imageNo);
+		$.ajax("/timeline/rest/deleteCategory",{
+			method : "GET",
+			dataType : "json",
+			data : {
+				categoryNo : categoryNo
+			},
+			success : function(response,status){
+				if(response.success){
+					$('span[name="'+categoryNo+'"]').remove();
+				}
+			},
+            error: function(xhr, status, error) {
+                alert('Error: ' + error);
+            }
+			
+		})
 	})
 })
 </script>

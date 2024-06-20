@@ -144,14 +144,25 @@ public class TimelineRestController {
 	
 	@PostMapping("updateCategory")
 	public ResponseEntity<Map<String, Object>> updateCategory(@ModelAttribute Category category,
-			@RequestParam(name="categoryImojiFile",required = true) MultipartFile categoryImojiFile,
+			@RequestParam(name="categoryImojiFile",required = false) MultipartFile categoryImojiFile,
 			Map<String, Object> map
 			) throws Exception,IOException {
-		System.out.println("category : "+category);
+		//System.out.println("category : "+category);
 		map = new HashMap<String, Object>();
 		category.setCategoryImoji( timelineUtil.imojiUrlToName(category.getCategoryImoji()) );
 		category = timelineUtil.uploadImojiFile(category, categoryImojiFile) ;
 		boolean success=timelineService.updateCategory(category)!=0 ? true:false;
+		map.put("success", success);
+		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("deleteCategory")
+	public ResponseEntity<Map<String, Object>> deleteCategory(
+			@RequestParam(name="categoryNo",required = true) int categoryNo,
+			Map<String, Object> map
+			) throws Exception,IOException {
+		map = new HashMap<String, Object>();
+		boolean success=timelineService.deleteCategory(categoryNo)!=0 ? true:false;
 		map.put("success", success);
 		return ResponseEntity.ok(map);
 	}

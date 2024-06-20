@@ -38,7 +38,7 @@ public interface TimelineService {
 	
 	public int updateCategory(Category category) throws Exception;
 	
-	public void deleteCategory(int categoryNo) throws Exception;
+	public int deleteCategory(int categoryNo) throws Exception;
 	
 	public CountAddressDto getCountAddress(Record record) throws Exception;
 	
