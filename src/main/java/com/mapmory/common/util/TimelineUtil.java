@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mapmory.services.timeline.domain.Category;
 import com.mapmory.services.timeline.domain.ImageTag;
 import com.mapmory.services.timeline.domain.MapRecord;
 import com.mapmory.services.timeline.domain.Record;
@@ -51,6 +52,9 @@ public class TimelineUtil {
 	
 	@Value("${object.timeline.image}")
 	private String imageFileFolder;
+	
+	@Value("${object.timeline.imoji}")
+	private String imojiFileFolder;
 	
 	@Value("${object.timeline.media}")
 	private String mediaFileFolder;
@@ -299,11 +303,36 @@ public class TimelineUtil {
 			return record;
 		}
 
+		public Record imojiNameToUrl(Record record) {
+			if (!(record.getCategoryImoji() == null || record.getCategoryImoji().equals(""))) {
+				record.setCategoryImoji(objectStorageUtil.getImageUrl(record.getCategoryImoji(), imojiFileFolder));
+			}
+			return record;
+		}
+
 		public Record mediaNameToUrl(Record record) {
 			if (!(record.getMediaName() == null || record.getMediaName().equals(""))) {
 				record.setMediaName(objectStorageUtil.getImageUrl(record.getMediaName(), mediaFileFolder));
 			}
 			return record;
+		}
+		
+		public List<Category> categoryImojiListToUrl(List<Category> categoryList) {
+				List<Category> tempList = new ArrayList<Category>();
+				for (Category category : categoryList) {
+					if(!(category.getCategoryImoji()==null ||category.getCategoryImoji().isEmpty())) {
+						category.setCategoryImoji(objectStorageUtil.getImageUrl(category.getCategoryImoji(), imojiFileFolder));
+					}
+					tempList.add(category);
+				}
+			return tempList;
+		}
+		
+		public Category categoryImojiNameToUrl(Category category) {
+					if(!(category.getCategoryImoji()==null ||category.getCategoryImoji().isEmpty())) {
+						category.setCategoryImoji(objectStorageUtil.getImageUrl(category.getCategoryImoji(), imojiFileFolder));
+					}
+			return category;
 		}
 
 		public String imageUrlToName(String imageUrl) {
@@ -318,6 +347,12 @@ public class TimelineUtil {
 				mediaUrl = mediaUrl.replace(cdnUrl+mediaFileFolder+"/","");
 			}
 			return mediaUrl;
+		}
+		public String imojiUrlToName(String imojiUrl) {
+			if (!(imojiUrl == null || imojiUrl.equals(""))) {
+				imojiUrl = imojiUrl.replace(cdnUrl+imojiFileFolder+"/","");
+			}
+			return imojiUrl;
 		}
 		
 		public Record uploadImageFile(Record record,List<MultipartFile> imageFile) throws Exception {
@@ -360,6 +395,21 @@ public class TimelineUtil {
 			record.setMediaName(uuid);
 
 			return record;
+			
+		}
+		
+		public Category uploadImojiFile(Category category,MultipartFile imojiFile) throws Exception {
+
+			if (imojiFile.isEmpty() || imojiFile.getOriginalFilename() == null
+					|| imojiFile.getOriginalFilename().isEmpty()) {
+				System.out.println("Invalid file name: " + category.getCategoryImoji());
+				return category;
+			}
+			String uuid = ImageFileUtil.getImageUUIDFileName(imojiFile.getOriginalFilename());
+			objectStorageUtil.uploadFileToS3(imojiFile, uuid, imojiFileFolder);
+			category.setCategoryImoji(uuid);
+
+			return category;
 			
 		}
 		

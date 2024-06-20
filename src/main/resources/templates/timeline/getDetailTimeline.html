@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="/css/5/cosmo/bootstrap.css">
 <link rel="stylesheet" href="/css/common/footer.css">
 <style type="text/css">
+#categorySpan{
+	background-color: #00C6E1;
+}
 </style>
 </head>
 <body>
@@ -18,8 +21,10 @@
   		<div class="card-body">
     		<h4 class="card-title">
  				<span th:text="${record.recordTitle}"></span>
- 				<img/>
- 				<span class="badge bg-primary" th:text="${record.categoryName}"></span>
+ 				<span id="categorySpan" class="badge">
+ 					<img th:src="${record.categoryImoji}" style="height:18px;"/>
+ 					<span th:text="${record.categoryName}"></span>
+ 				</span>
  				<span class="badge bg-primary" th:text="${updateCountText}"></span>
  				<span class="badge bg-primary" th:text="${record.sharedDate!=null ? '공유됨' : '비공유'}"></span>
  			</h4>
