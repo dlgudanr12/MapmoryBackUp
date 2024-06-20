@@ -111,7 +111,7 @@
     
     <div class="row">
      	<label for="recordText" class="form-label mt-4" th:text="'텍스트'"></label>
-     	<input type="text" class="form-control" th:field="*{recordText}" autocomplete="off">
+     	<textarea class="form-control" th:field="*{recordText}" rows="3" autocomplete="off"></textarea>
 		<small id="recordTextHelp" class="form-text text-muted" th:text="'상품 이모지 사용 예시 : \\안녕\\'"></small>
 		<small id="recordTextHelp2" class="form-text text-muted" th:text="'1천 자 이하 작성 가능합니다.'"></small>
 		<div id="recordTextHelp3" class="d-none">
@@ -303,7 +303,7 @@ function badWord(text, idName){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-	let text1 = $('input[name="recordText"]').val();
+	let text1 = $('textarea[name="recordText"]').val();
     let idName1 = 'recordTextHelp3';
     badWord(text1, idName1);
 
@@ -390,8 +390,8 @@ $(function() {
 		})
 	})
 	
-	$('input[name="recordText"]').on('keyup',function(event){
-		let text=$('input[name="recordText"]').val();
+	$('textarea[name="recordText"]').on('keyup',function(event){
+		let text=$('textarea[name="recordText"]').val();
 		let idName='recordTextHelp3';
 		if (event.keyCode === 32 || event.keyCode === 8) {
 			badWord(text,idName);
